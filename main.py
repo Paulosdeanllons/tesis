@@ -73,7 +73,7 @@ for element in listaTXT:
         #Construimos el corpus original que se utilizadara para los modelos, por lo
         #que agregaremos la informacion de cada informe de la carpeta
         corpusOriginal =  corpusOriginal.append([dataset])
-        print ('Se esta crando el CorpusOriginal de :' + element)
+        print ('Se esta creando el CorpusOriginal de :' + element)
     else:
         print ('No se ha creado el dataset')
     # close the file (parece que no es necesario)
@@ -82,7 +82,7 @@ for element in listaTXT:
 # Por si se necesita extraer todo el corpus analizado
 if exportarCorpus is True:
     corpusOriginal.to_csv('corpusFinal.csv', index=False)
-    print ('Se ha esportado el Corpus Original con toda la informacion')
+    print ('Se ha exportado el Corpus Original con toda la informacion')
 else:
     print('No se ha procedido a exportacion') 
 
