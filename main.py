@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Dec  3 12:11:41 2020
-
 @author: Paulo Romero Martinez
 @email: supertropo@gmail.com
 """
@@ -12,6 +11,7 @@ Created on Thu Dec  3 12:11:41 2020
 import pandas as pd
 import re
 import nltk
+import os
 
 from os import scandir
 
@@ -32,6 +32,8 @@ construirDataframe = False
 exportarCorpus = False
 
 nltk.download('stopwords')
+nltk.download('punkt')
+
 
 #%%
 
@@ -43,7 +45,7 @@ nltk.download('stopwords')
 def ls2(directorio): 
     return [obj.name for obj in scandir(directorio) if obj.is_file()]
 
-path = '/home/tropo/Code/Mining_NPLtr/samples/'
+path = './tmp/'
 listaTXT = ls2(path)
 
 #leer el titulo y el txt
@@ -78,6 +80,10 @@ for element in listaTXT:
         print ('No se ha creado el dataset')
     # close the file (parece que no es necesario)
     file.close()
+
+dir = './tmp/'
+for f in os.listdir(dir):
+    os.remove(os.path.join(dir, f))
 
 # Por si se necesita extraer todo el corpus analizado
 if exportarCorpus is True:
