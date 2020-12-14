@@ -12,6 +12,7 @@ import pandas as pd
 import re
 import nltk
 import os
+import numpy as np
 
 from os import scandir
 
@@ -33,6 +34,8 @@ exportarCorpus = False
 
 nltk.download('stopwords')
 nltk.download('punkt')
+#Creamos el df para ir almacenando las clasificaciones de los projectos analizados
+Clasificacion = pd.DataFrame()
 
 
 #%%
@@ -47,13 +50,15 @@ def ls2(directorio):
 
 path = './tmp/'
 listaTXT = ls2(path)
+#creamos un df como indice de los proyectos a clasificar
+Clasificacion ['Proyectos']= listaTXT
 
 #leer el titulo y el txt
 dataset = pd.DataFrame()
 corpusOriginal = pd.DataFrame()
 corpus = []
 
-for element in listaTXT:    
+for element in listaTXT: 
     # Open a file: file
     file = open(path + element,mode='r') 
     # read all lines at once
@@ -81,9 +86,9 @@ for element in listaTXT:
     # close the file (parece que no es necesario)
     file.close()
 
-dir = './tmp/'
-for f in os.listdir(dir):
-    os.remove(os.path.join(dir, f))
+# dir = './tmp/'
+# for f in os.listdir(dir):
+#     os.remove(os.path.join(dir, f))
 
 # Por si se necesita extraer todo el corpus analizado
 if exportarCorpus is True:
@@ -147,22 +152,12 @@ plt.show()
 
 
 # Aplicar el método de k-means para segmentar el data set
-kmeans = KMeans(n_clusters = 2, init="k-means++", max_iter = 300, n_init = 10, random_state = 0)
+kmeans = KMeans(n_clusters = 3, init="k-means++", max_iter = 300, n_init = 10, random_state = 0)
 y_kmeans = kmeans.fit_predict(X)
+#añadimos la clasificacion a df con los proyectos analizados
+Clasificacion['K-means'] = y_kmeans
 
-
-# # Visualización de los clusters a modo de EJEMPLO
-# plt.scatter(X[y_kmeans == 0, 0], X[y_kmeans == 0, 1], s = 100, c = "red", label = "x")
-# plt.scatter(X[y_kmeans == 1, 0], X[y_kmeans == 1, 1], s = 100, c = "blue", label = "xx")
-# plt.scatter(X[y_kmeans == 2, 0], X[y_kmeans == 2, 1], s = 100, c = "green", label = "xxx")
-# plt.scatter(X[y_kmeans == 3, 0], X[y_kmeans == 3, 1], s = 100, c = "cyan", label = "xxx")
-# plt.scatter(X[y_kmeans == 4, 0], X[y_kmeans == 4, 1], s = 100, c = "magenta", label = "xxxxx")
-# plt.scatter(kmeans.cluster_centers_[:,0], kmeans.cluster_centers_[:,1], s = 300, c = "yellow", label = "xxxxxx")
-# plt.title("Cluster de informes")
-# plt.xlabel("XXX")
-# plt.ylabel("Puntuación de Calidad (1-100)")
-# plt.legend()
-# plt.show()
+# IDEA crear una grafica para visualiza los grupos
 
 
 
@@ -182,16 +177,7 @@ plt.show()
 from sklearn.cluster import AgglomerativeClustering
 hc = AgglomerativeClustering(n_clusters = 2, affinity = "euclidean", linkage = "ward")
 y_hc = hc.fit_predict(X)
+#añadimos la clasificacion a df con los proyectos analizados
+Clasificacion['hc'] = y_hc
 
-
-# # Visualización de los clusters
-# plt.scatter(X[y_hc == 0, 0], X[y_hc == 0, 1], s = 100, c = "red", label = "x")
-# plt.scatter(X[y_hc == 1, 0], X[y_hc == 1, 1], s = 100, c = "blue", label = "xxx")
-# plt.scatter(X[y_hc == 2, 0], X[y_hc == 2, 1], s = 100, c = "green", label = "xxx")
-# plt.scatter(X[y_hc == 3, 0], X[y_hc == 3, 1], s = 100, c = "cyan", label = "xxxx")
-# plt.scatter(X[y_hc == 4, 0], X[y_hc == 4, 1], s = 100, c = "magenta", label = "xxx")
-# plt.title("Cluster de Informes")
-# plt.xlabel("XXX")
-# plt.ylabel("Puntuación de Infomes (1-100)")
-# plt.legend()
-# plt.show()
+# IDEA crear una grafica para visualiza los grupos
