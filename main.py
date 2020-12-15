@@ -32,6 +32,8 @@ construirDataframe = False
 
 exportarCorpus = False
 
+exportarClasificacion = True
+
 nltk.download('stopwords')
 nltk.download('punkt')
 #Creamos el df para ir almacenando las clasificaciones de los projectos analizados
@@ -126,15 +128,14 @@ diccionario_calidad = diccionario['calidad']
 
 CountVec = CountVectorizer(ngram_range=(1,1), # to use bigrams ngram_range=(2,2)
                            stop_words='english',
-                           min_df = 5, # minimum number of times a word must appear
+                           #min_df = 5, # minimum number of times a word must appear
                            vocabulary = diccionario_calidad 
                            )
 Count_data = CountVec.fit_transform(corpus)
 cv_dataframe = pd.DataFrame(Count_data.toarray(),columns=CountVec.get_feature_names())
 
 #Si queremos utilizar este df para posteriores metodos
-# X = cv_dataframe
-
+xx = CountVec.fit_transform(corpus).toarray()
 cv_dataframe ['Proyectos'] = listaTXT
 
 
@@ -182,7 +183,7 @@ from sklearn.cluster import KMeans
 wcss = []
 for i in range(1, 65):
     kmeans = KMeans(n_clusters = i, init = "k-means++", max_iter = 300, n_init = 10, random_state = 0)
-    kmeans.fit(X)
+    kmeans.fit(xx)
     wcss.append(kmeans.inertia_)
 
 plt.plot(range(1,65), wcss)
@@ -193,7 +194,7 @@ plt.show()
 
 
 # Aplicar el método de k-means para segmentar el data set
-kmeans = KMeans(n_clusters = 10, init="k-means++", max_iter = 300, n_init = 10, random_state = 0)
+kmeans = KMeans(n_clusters = 5, init="k-means++", max_iter = 300, n_init = 10, random_state = 0)
 y_kmeans = kmeans.fit_predict(X)
 #añadimos la clasificacion a df con los proyectos analizados
 Clasificacion['K-means'] = y_kmeans
@@ -210,7 +211,7 @@ Clasificacion['K-means'] = y_kmeans
 
 # Utilizar el dendrograma para encontrar el número óptimo de clusters
 import scipy.cluster.hierarchy as sch
-dendrogram = sch.dendrogram(sch.linkage(X, method = "ward"))
+dendrogram = sch.dendrogram(sch.linkage(xx, method = "ward"))
 plt.title("Dendrograma")
 plt.xlabel("Projectos")
 plt.ylabel("Distancia Euclídea")
@@ -225,3 +226,8 @@ Clasificacion['hc'] = y_hc
 
 # IDEA crear una grafica para visualiza los grupos
 
+if exportarClasificacion is True:
+    Clasificacion.to_csv('./samples/' + 'ClasificacionFinal.csv', index=False)
+    print ('Se ha exportado la clasificaion de clusterin jerarquico y k-means')
+else:
+    print('No se ha procedido a exportacion') 
