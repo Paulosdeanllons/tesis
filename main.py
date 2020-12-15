@@ -110,14 +110,55 @@ cv = CountVectorizer(max_features = 1500)
 
 X = cv.fit_transform(corpus).toarray()
 
-wordfreq = {}
-for palabra in corpus:
-    tokens = nltk.word_tokenize(palabra)
-    for token in tokens:
-        if token not in wordfreq.keys():
-            wordfreq[token] = 1
-        else:
-            wordfreq[token] += 1
+#create dataframe con los nombres de las palabras
+
+# =============================================================================
+# BOW model using specific keywords
+# =============================================================================
+
+#Import specific quality index keywords usin json 
+import json 
+
+with open('qualityKeywords.json', 'r') as f:
+    diccionario = json.load(f)
+
+diccionario_calidad = diccionario['calidad']
+
+CountVec = CountVectorizer(ngram_range=(1,1), # to use bigrams ngram_range=(2,2)
+                           stop_words='english',
+                           min_df = 5, # minimum number of times a word must appear
+                           vocabulary = diccionario_calidad 
+                           )
+Count_data = CountVec.fit_transform(corpus)
+cv_dataframe = pd.DataFrame(Count_data.toarray(),columns=CountVec.get_feature_names())
+
+#Si queremos utilizar este df para posteriores metodos
+# X = cv_dataframe
+
+cv_dataframe ['Proyectos'] = listaTXT
+
+
+# =============================================================================
+# Conteo de la frecuencia de palabras en cas de ser util
+# =============================================================================
+# wordfreq = {}
+# for palabra in corpus:
+#     tokens = nltk.word_tokenize(palabra)
+#     for token in tokens:
+#         if token not in wordfreq.keys():
+#             wordfreq[token] = 1
+#         else:
+#             wordfreq[token] += 1
+
+#%%
+# =============================================================================
+# TF-IDF Model
+# =============================================================================
+
+from sklearn.feature_extraction.text import TfidfTransformer
+transformer = TfidfTransformer()
+X = transformer.fit_transform(X).toarray()
+
 #%%
 
 # =============================================================================
@@ -139,12 +180,12 @@ from sklearn.cluster import KMeans
 # Método del codo para averiguar el número óptimo de clusters
 # OJO que solo tengo 5 informes por ahora
 wcss = []
-for i in range(1, 5):
+for i in range(1, 65):
     kmeans = KMeans(n_clusters = i, init = "k-means++", max_iter = 300, n_init = 10, random_state = 0)
     kmeans.fit(X)
     wcss.append(kmeans.inertia_)
 
-plt.plot(range(1,5), wcss)
+plt.plot(range(1,65), wcss)
 plt.title("Método del codo")
 plt.xlabel("Número de Clusters")
 plt.ylabel("WCSS(k)")
@@ -152,14 +193,16 @@ plt.show()
 
 
 # Aplicar el método de k-means para segmentar el data set
-kmeans = KMeans(n_clusters = 3, init="k-means++", max_iter = 300, n_init = 10, random_state = 0)
+kmeans = KMeans(n_clusters = 10, init="k-means++", max_iter = 300, n_init = 10, random_state = 0)
 y_kmeans = kmeans.fit_predict(X)
 #añadimos la clasificacion a df con los proyectos analizados
 Clasificacion['K-means'] = y_kmeans
 
 # IDEA crear una grafica para visualiza los grupos
 
-
+# =============================================================================
+# hdbscan para vis
+# =============================================================================
 
 # =============================================================================
 # # Clustering Jerárquico
@@ -175,9 +218,10 @@ plt.show()
 
 # Ajustar el clustetring jerárquico a nuestro conjunto de datos
 from sklearn.cluster import AgglomerativeClustering
-hc = AgglomerativeClustering(n_clusters = 2, affinity = "euclidean", linkage = "ward")
+hc = AgglomerativeClustering(n_clusters = 5, affinity = "euclidean", linkage = "ward")
 y_hc = hc.fit_predict(X)
 #añadimos la clasificacion a df con los proyectos analizados
 Clasificacion['hc'] = y_hc
 
 # IDEA crear una grafica para visualiza los grupos
+

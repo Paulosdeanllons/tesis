@@ -1,7 +1,7 @@
 *.txt
 *.csv
+qualityKeywords.json
 listado.log
 samples/
 tmp/
 input/
-
