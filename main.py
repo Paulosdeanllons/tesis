@@ -329,24 +329,23 @@ calinski_harabasz_score(X, labels)
 # =============================================================================
 
 # Utilizar el dendrograma para encontrar el número óptimo de clusters
+import scipy.cluster.hierarchy as sch
+dendrogram = sch.dendrogram(sch.linkage(X, method = "ward"))
+plt.title("Dendrograma")
+plt.xlabel("Projectos")
+plt.ylabel("Distancia Euclídea")
+plt.show()
+
+# Ajustar el clustetring jerárquico a nuestro conjunto de datos
+from sklearn.cluster import AgglomerativeClustering
+hc = AgglomerativeClustering(n_clusters = 10, affinity = "euclidean", linkage = "ward")
+y_hc = hc.fit_predict(X)
+#añadimos la clasificacion a df con los proyectos analizados
+Clasificacion['hc'] = y_hc
+
+# IDEA crear una grafica para visualiza los grupos
+
 if exportarClasificacion is True:
-    import scipy.cluster.hierarchy as sch
-    dendrogram = sch.dendrogram(sch.linkage(X, method = "ward"))
-    plt.title("Dendrograma")
-    plt.xlabel("Projectos")
-    plt.ylabel("Distancia Euclídea")
-    plt.show()
-
-    # Ajustar el clustetring jerárquico a nuestro conjunto de datos
-    from sklearn.cluster import AgglomerativeClustering
-    hc = AgglomerativeClustering(n_clusters = 10, affinity = "euclidean", linkage = "ward")
-    y_hc = hc.fit_predict(X)
-    #añadimos la clasificacion a df con los proyectos analizados
-    Clasificacion['hc'] = y_hc
-
-    # IDEA crear una grafica para visualiza los grupos
-
-
     Clasificacion.to_csv('./samples/' + 'ClasificacionFinal.csv', index=False)
     print ('Se ha exportado la clasificaion de clusterin jerarquico y k-means')
 else:
