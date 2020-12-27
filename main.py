@@ -3,7 +3,7 @@
 """
 Created on Thu Dec  3 12:11:41 2020
 @author: Paulo Romero Martinez
-@email: supertropo@gmail.com
+@email: paulo.romero.martinez@gmail.com
 """
 ## Natural Language Processing for Mining Technical Report
 
@@ -15,29 +15,36 @@ import os
 import numpy as np
 
 from os import scandir
-
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 
+# Libreiras npl utilizadas
+
+nltk.download('stopwords')
+nltk.download('punkt')
 
 #%%
 
 # =============================================================================
-# Opciones de analisis generales
+# Opciones de analisis generales para dirigir el proceso
 # =============================================================================
 
-#Opcion para crear el dataframe con el texto del informe y su titulo
+#Opcion para crear el dataframe con el texto del informe y su titulo.
 
 construirDataframe = False
 
+# Exportar el corpus de los documentos a un csv OJO puede ser muy grande.
+
 exportarCorpus = False
+
+# Exportar la clasificacion final de los informes a csv
 
 exportarClasificacion = True
 
+# Obtener las imagenes de los clusters mediante Silhouette y Calinski-Harabasz index 
+
 silhouette = True
 
-nltk.download('stopwords')
-nltk.download('punkt')
 #Creamos el df para ir almacenando las clasificaciones de los projectos analizados
 Clasificacion = pd.DataFrame()
 
@@ -45,23 +52,26 @@ Clasificacion = pd.DataFrame()
 #%%
 
 # =============================================================================
-# Importacion y limpieza de los txt de los informes
+# Importacion y limpieza de los txt de los technical Report
 # =============================================================================
 
 # Importar el dataset
+
 def ls2(directorio): 
     return [obj.name for obj in scandir(directorio) if obj.is_file()]
-
 path = './tmp/'
 listaTXT = ls2(path)
-#creamos un df como indice de los proyectos a clasificar
+
+# Añadimos al df Calsificacion los proyectos a clasificar
+
 Clasificacion ['Proyectos']= listaTXT
 
-#leer el titulo y el txt
+# Leemos el titulo y el txt
+
 dataset = pd.DataFrame()
 corpusOriginal = pd.DataFrame()
 corpus = []
-
+# Limpiamos y borramos las stopwords del texto de txt using regex and english spopwords
 for element in listaTXT: 
     # Open a file: file
     file = open(path + element,mode='r') 
@@ -77,7 +87,7 @@ for element in listaTXT:
     texto = ' '.join(texto)
     corpus.append(texto)
     
-    #cargamos los datos en el dataset por proyecto por si lo utilizamos en el futuro
+    # Cargamos los datos en el dataset por proyecto por si lo utilizamos en el futuro
     if construirDataframe is True:        
         dataset['projecto'] = [element]
         dataset['informe'] = [corpus]
@@ -90,11 +100,12 @@ for element in listaTXT:
     # close the file (parece que no es necesario)
     file.close()
 
+# Borramos los informes ya analizados del direcctorio temporal
 # dir = './tmp/'
 # for f in os.listdir(dir):
 #     os.remove(os.path.join(dir, f))
 
-# Por si se necesita extraer todo el corpus analizado
+# Por si se necesita extraer en csv todo el corpus analizado
 if exportarCorpus is True:
     corpusOriginal.to_csv('corpusFinal.csv', index=False)
     print ('Se ha exportado el Corpus Original con toda la informacion')
